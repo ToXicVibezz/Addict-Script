@@ -5465,7 +5465,7 @@ addict.action(Lobby_menu, "Kick Host", {"cskickhost"}, "Kicks the Host in your C
     if players.get_host() ~= players.user() then
         addict.trigger_command(addict.ref_by_command_name("kick"..CurrentHostNameLower))
     else
-        util.toast("-ToXic_Script-\n\nThis Command doesn't Work on yourself; You are already the Host!")
+        util.toast("-Addict_Script-\n\nThis Command doesn't Work on yourself; You are already the Host!")
     end
     util.toast("Host Kick Completed")
 end)
