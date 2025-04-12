@@ -1,4 +1,4 @@
--- Addict Script™ Copyright© 2024
+-- Addict Script™ Copyright© 2025
 
 util.keep_running()
 util.require_natives("natives-1663599433-uno")
@@ -12,8 +12,8 @@ util.require_natives("natives-3407a")
 guidedMissile = require "ToxTool"
 
 local addict = menu
-local addict_version = 1.54
-local gta_version = "v3442"
+local addict_version = 1.55
+local gta_version = "v3504"
 local dcinv = "fg6Ex4PbkJ"
 local dev_mode = false -- Disables stuff like updates [true/false]
 
