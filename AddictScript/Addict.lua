@@ -12,8 +12,8 @@ util.require_natives("natives-3407a")
 guidedMissile = require "ToxTool"
 
 local addict = menu
-local addict_version = 1.56
-local gta_version = "v3521"
+local addict_version = 1.57
+local gta_version = "v3570"
 local dcinv = "J77yab3nUR"
 local dev_mode = false -- Disables stuff like updates [true/false]
 
