@@ -13,7 +13,7 @@ guidedMissile = require "ToxTool"
 
 local addict = menu
 local addict_version = 1.57
-local gta_version = "v3570"
+local gta_version = "v3570.0"
 local dcinv = "J77yab3nUR"
 local dev_mode = false -- Disables stuff like updates [true/false]
 
